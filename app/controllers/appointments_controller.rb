@@ -14,7 +14,7 @@ class AppointmentsController < ApplicationController
   end
 
   def create
-    @appointment = Appointment.new(appt_params)
+    @appointment = Appointment.new(reformat_params_date)
     if @appointment.save
       render status: 200, json: {
         message: "Successfully created appointment",
@@ -52,8 +52,14 @@ class AppointmentsController < ApplicationController
 
   private
   def appt_params
-    params.require("appointment")
-          .permit(:first_name, :last_name, :start_time, :end_time, :comments)
+    params.permit(:first_name, :last_name, :start_time, :end_time, :comments)
+  end
+
+  def reformat_params_date
+    new_params = appt_params
+    new_params[:start_time] = DateTime.strptime(new_params[:start_time], '%m/%d/%Y %H:%M')
+    new_params[:end_time] = DateTime.strptime(new_params[:end_time], '%m/%d/%Y %H:%M')
+    new_params
   end
 
 end
