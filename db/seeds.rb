@@ -5,6 +5,9 @@
 #
 #   cities = City.create([{ name: 'Chicago' }, { name: 'Copenhagen' }])
 #   Mayor.create(name: 'Emanuel', city: cities.first)
+
+# Beginning parse appt_data.csv and turn each line into an appointment
+
 require 'csv'
 
 csv_text = File.read(Rails.root.join('lib', 'seeds', 'appt_data.csv'))
@@ -24,9 +27,11 @@ csv.each do |row|
   a.first_name = row[2]
   a.last_name = row[3]
   a.comments = row[4] if row[4].nil? == false
-  a.save
+  a.save(validate: false)
   # p a
   puts "#{a.first_name} #{a.last_name}'s appointment is saved."
   puts "Starts at #{a.start_time} and ends at #{a.end_time}"
   puts "*" * 60
 end
+
+# End parse appt_data.csv and turn each line into an appointment

@@ -4,7 +4,7 @@ class Appointment < ActiveRecord::Base
   validates :start_time, presence: true
   validates :end_time, presence: true
   include ActiveModel::Validations
-  validates_with ApplicationDateValidator
+  validates_with AppointmentDateValidator
 
   def reformat_date_from_string
     DateTime.strptime(self.start_time, '%m/%d/%Y %H:%M')

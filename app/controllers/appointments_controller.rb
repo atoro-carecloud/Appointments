@@ -3,7 +3,15 @@ class AppointmentsController < ApplicationController
   # Worried about security of this line!
 
   def list
-    @appointments = Appointment.all
+    if appt_params[:last_name]
+      @appointments = Appointment.where(last_name: appt_params[:last_name])
+      #
+      # Pick up here!
+      # Keep writing search stuff for json results!
+      #
+    else
+      @appointments = Appointment.all
+    end
     render json: @appointments
   end
 
@@ -19,16 +27,16 @@ class AppointmentsController < ApplicationController
     # p valid_params_end_time?
     # p "*" * 50
     # if valid_params_start_time? && valid_params_end_time?
-      if @appointment.save
-        render status: 200, json: {
-          message: "Successfully created appointment",
-          appointment: @appointment
-        }.to_json
-      else
-        render status: 422, json: {
-          errors: @appointment.errors
-        }.to_json
-      end
+    if @appointment.save
+      render status: 200, json: {
+        message: "Successfully created appointment",
+        appointment: @appointment
+      }.to_json
+    else
+      render status: 422, json: {
+        errors: @appointment.errors
+      }.to_json
+    end
     # else
     #   render status: 422, json: {
     #     errors: @appointment.errors

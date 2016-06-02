@@ -1,6 +1,7 @@
 Rails.application.routes.draw do
 
-  resources :appointments, except: [:index]
+  resources :appointments, except: [:index, :new, :create]
+  post 'appointments/new' => 'appointments#create', as: :new_appointment
   root 'appointments#list'
   get 'appointments/' => 'appointments#list', as: :list
 

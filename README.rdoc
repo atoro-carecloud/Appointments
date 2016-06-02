@@ -26,3 +26,21 @@ Things you may want to cover:
 
 Please feel free to use a different markup language if you do not plan to run
 <tt>rake doc:app</tt>.
+
+Dev Notes:
+ * Handling CRUD Actions
+    - Create (user sends curl post request)
+      > Example URL: curl -i \
+                     -H "Accept: application/json" \
+                     -H "Content-Type: application/json" \
+                     -X POST -d '{"start_time":"11/7/17 13:30","end_time":"11/7/17 13:40", "first_name":"Bill","last_name":"Golik"}' \
+                     http://localhost:3000/appointments
+    - Update (user sends curl post request)
+    - Delete (user sends curl post request)
+    - List (user sends search params thru url)
+ * Must return valid json
+ * Times must be in the future
+ * Times cannot overlap existing appointment on the same day
+
+To Do:
+ * Limit length of newly created appointments (2 hrs?)

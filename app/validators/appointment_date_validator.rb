@@ -1,4 +1,4 @@
-class ApplicationDateValidator < ActiveModel::Validator
+class AppointmentDateValidator < ActiveModel::Validator
 
   def validate(record)
     set_appointments_to_test_against
@@ -19,19 +19,21 @@ class ApplicationDateValidator < ActiveModel::Validator
   end
 
   def set_appointments_to_test_against
-    now_until_future = Time.now..(Time.now + 999_999_999)
+    now_until_future = Time.now..(Time.now + 50.years)
     @upcoming_appts = Appointment.where(start_time: now_until_future)
   end
 
   def is_start_time_formatted?(record)
     if record.start_time < Time.now
-      record.errors[:base] << "Start time is not properly formatted."
+      record.errors[:base] << "Start time is either (a) not properly " +
+      "formatted, or (b) in the past."
     end
   end
 
   def is_end_time_formatted?(record)
     if record.end_time < Time.now
-      record.errors[:base] << "End time is not properly formatted."
+      record.errors[:base] << "End time is either (a) not properly " +
+      "formatted, or (b) in the past."
     end
   end
 
