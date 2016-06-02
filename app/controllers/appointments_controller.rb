@@ -58,7 +58,9 @@ class AppointmentsController < ApplicationController
   def reformat_params_date
     new_params = appt_params
     new_params[:start_time] = DateTime.strptime(new_params[:start_time], '%m/%d/%Y %H:%M')
+    new_params[:start_time] = new_params[:start_time] + 2000.years
     new_params[:end_time] = DateTime.strptime(new_params[:end_time], '%m/%d/%Y %H:%M')
+    new_params[:end_time] = new_params[:end_time] + 2000.years
     new_params
   end
 
