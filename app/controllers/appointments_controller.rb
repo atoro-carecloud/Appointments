@@ -2,7 +2,6 @@ class AppointmentsController < ApplicationController
   skip_before_filter :verify_authenticity_token
   # Worried about security of this line!
 
-
   def list
     @appointments = Appointment.all
     render json: @appointments
@@ -15,7 +14,11 @@ class AppointmentsController < ApplicationController
 
   def create
     @appointment = Appointment.new(reformat_params_date)
-    if valid_params_start_time? && valid_params_end_time?
+    # p "*" * 50
+    # p valid_params_start_time?
+    # p valid_params_end_time?
+    # p "*" * 50
+    # if valid_params_start_time? && valid_params_end_time?
       if @appointment.save
         render status: 200, json: {
           message: "Successfully created appointment",
@@ -26,12 +29,11 @@ class AppointmentsController < ApplicationController
           errors: @appointment.errors
         }.to_json
       end
-    else
-      render status: 422, json: {
-        problem: "error2",
-        errors: @appointment.errors
-      }.to_json
-    end
+    # else
+    #   render status: 422, json: {
+    #     errors: @appointment.errors
+    #   }.to_json
+    # end
   end
 
   def update
@@ -71,27 +73,20 @@ class AppointmentsController < ApplicationController
     new_params
   end
 
-  def valid_params_start_time?
-    new_params = reformat_params_date
-    # p "*" * 50
-    # p date = new_params[:start_time]
-    # p date < Time.now
-    # p "*" * 50
-    if date < Time.now
-      return false
-    end
-    true
-  end
+  # def valid_params_start_time?
+  #   new_params = reformat_params_date
+  #   date = new_params[:start_time]
+  #   return false if date < Time.now
+  #   true
+  # end
 
-  def valid_params_end_time?
-    new_params = reformat_params_date
-    # p "*" * 50
-    # p date = new_params[:end_time]
-    # p "*" * 50
-    if date < Time.now || date < new_params[:start_time]
-      return false
-    end
-    true
-  end
+  # def valid_params_end_time?
+  #   new_params = reformat_params_date
+  #   date = new_params[:end_time]
+  #   if date < Time.now || date < new_params[:start_time]
+  #     return false
+  #   end
+  #   true
+  # end
 
 end

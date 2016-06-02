@@ -3,19 +3,21 @@ class Appointment < ActiveRecord::Base
   validates :last_name, presence: true
   validates :start_time, presence: true
   validates :end_time, presence: true
+  include ActiveModel::Validations
+  validates_with ApplicationDateValidator
 
   def reformat_date_from_string
     DateTime.strptime(self.start_time, '%m/%d/%Y %H:%M')
   end
 
-  def valid_dates?
-    if self.start_time <= Time.now
-      return false
-    end
-    if self.end_time <= Time.now
-      return false
-    end
-    true
-  end
+  # def is_time_taken?(datetime)
+  #   @upcoming_appts = Appointment.where(
+  #     start_time: Time.now..(Time.now + 999_999_999))
+  #
+  #     # Off to a good start here
+  #     # Off to a good start here
+  #     # Off to a good start here
+  #
+  # end
 
 end
