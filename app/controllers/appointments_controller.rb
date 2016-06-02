@@ -3,7 +3,7 @@ class AppointmentsController < ApplicationController
   # Worried about security of this line!
 
 
-  def index
+  def list
     @appointments = Appointment.all
     render json: @appointments
   end
@@ -15,13 +15,20 @@ class AppointmentsController < ApplicationController
 
   def create
     @appointment = Appointment.new(reformat_params_date)
-    if @appointment.save
-      render status: 200, json: {
-        message: "Successfully created appointment",
-        appointment: @appointment
-      }.to_json
+    if valid_params_start_time? && valid_params_end_time?
+      if @appointment.save
+        render status: 200, json: {
+          message: "Successfully created appointment",
+          appointment: @appointment
+        }.to_json
+      else
+        render status: 422, json: {
+          errors: @appointment.errors
+        }.to_json
+      end
     else
       render status: 422, json: {
+        problem: "error2",
         errors: @appointment.errors
       }.to_json
     end
@@ -57,11 +64,34 @@ class AppointmentsController < ApplicationController
 
   def reformat_params_date
     new_params = appt_params
-    new_params[:start_time] = DateTime.strptime(new_params[:start_time], '%m/%d/%Y %H:%M')
-    new_params[:start_time] = new_params[:start_time] + 2000.years
-    new_params[:end_time] = DateTime.strptime(new_params[:end_time], '%m/%d/%Y %H:%M')
-    new_params[:end_time] = new_params[:end_time] + 2000.years
+    new_params[:start_time] = DateTime
+      .strptime(new_params[:start_time], '%m/%d/%Y %H:%M') + 2000.years
+    new_params[:end_time] = DateTime
+      .strptime(new_params[:end_time], '%m/%d/%Y %H:%M') + 2000.years
     new_params
+  end
+
+  def valid_params_start_time?
+    new_params = reformat_params_date
+    # p "*" * 50
+    # p date = new_params[:start_time]
+    # p date < Time.now
+    # p "*" * 50
+    if date < Time.now
+      return false
+    end
+    true
+  end
+
+  def valid_params_end_time?
+    new_params = reformat_params_date
+    # p "*" * 50
+    # p date = new_params[:end_time]
+    # p "*" * 50
+    if date < Time.now || date < new_params[:start_time]
+      return false
+    end
+    true
   end
 
 end
