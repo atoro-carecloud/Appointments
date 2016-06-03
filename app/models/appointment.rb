@@ -10,10 +10,10 @@ class Appointment < ActiveRecord::Base
     DateTime.strptime(self.start_time, '%m/%d/%Y %H:%M')
   end
 
-# Problem here where first_name search, start_date search do not work.
-# At least in that first case, it DOES work when some dates are included.
-# Also displays empty JSON when no criteria are given
-# Work on this!
+### Problem here where first_name search, start_date search do not work.
+### At least in that first case, it DOES work when some dates are included.
+### Also displays empty JSON when no criteria are given
+### Work on this!
 
   def set_date_search_variables(appt_params)
 
@@ -33,11 +33,19 @@ class Appointment < ActiveRecord::Base
     # Creates date objects and range of those objects
     set_beg_end_dates
 
-    # Pushes date_range back into appt_params
-    appt_params[:start_time] = @date_range
-
+    p "*" * 50
+    p "appt_params: #{appt_params}"
+    p "*" * 50
+    # Pushes date_range back into appt_params if params were given
+    if(appt_params[:hour] ||
+       appt_params[:day] ||
+       appt_params[:month] ||
+       appt_params[:year])
+      appt_params[:start_time] = @date_range
+    end
     # Removes params not in database and returns appt_params
     delete_unsearchable_params(appt_params)
+    ### Problem is that search will limit to today if there are no date params
   end
 
   def set_beg_times_initial
@@ -62,6 +70,7 @@ class Appointment < ActiveRecord::Base
     @end_year = @beg_year
   end
 
+### This wordiness is absolutely terrible, refactor before submission, Mike
   def adjust_times_on_search_spec
     if @search_spec == :hour
       if @beg_hour == 23

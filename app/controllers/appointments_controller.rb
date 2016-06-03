@@ -17,27 +17,20 @@ class AppointmentsController < ApplicationController
   end
 
   def create
-    @appointment = Appointment.new(reformat_params_date)
-    # p "*" * 50
-    # p valid_params_start_time?
-    # p valid_params_end_time?
-    # p "*" * 50
-    # if valid_params_start_time? && valid_params_end_time?
-    if @appointment.save
-      render status: 200, json: {
-        message: "Successfully created appointment",
-        appointment: @appointment
-      }.to_json
-    else
-      render status: 422, json: {
-        errors: @appointment.errors
-      }.to_json
+    create_params = reformat_params_date
+    if @create_success
+      @appointment = Appointment.new(create_params)
+      if @appointment.save
+        render status: 200, json: {
+          message: "Successfully created appointment",
+          appointment: @appointment
+        }.to_json
+      else
+        render status: 422, json: {
+          errors: @appointment.errors
+        }.to_json
+      end
     end
-    # else
-    #   render status: 422, json: {
-    #     errors: @appointment.errors
-    #   }.to_json
-    # end
   end
 
   def update
@@ -70,28 +63,20 @@ class AppointmentsController < ApplicationController
   end
 
   def reformat_params_date
+    @create_success = true
     new_params = appt_params
-    new_params[:start_time] = DateTime
-      .strptime(new_params[:start_time], '%m/%d/%Y %H:%M') + 2000.years
-    new_params[:end_time] = DateTime
-      .strptime(new_params[:end_time], '%m/%d/%Y %H:%M') + 2000.years
-    new_params
+    begin
+      new_params[:start_time] = DateTime
+        .strptime(new_params[:start_time], '%m/%d/%Y %H:%M') + 2000.years
+      new_params[:end_time] = DateTime
+        .strptime(new_params[:end_time], '%m/%d/%Y %H:%M') + 2000.years
+    rescue
+      @create_success = false
+      error = "One of your dates is invalid."
+      render status: 422, json: {
+        errors: error
+      }.to_json
+    end
   end
-
-  # def valid_params_start_time?
-  #   new_params = reformat_params_date
-  #   date = new_params[:start_time]
-  #   return false if date < Time.now
-  #   true
-  # end
-
-  # def valid_params_end_time?
-  #   new_params = reformat_params_date
-  #   date = new_params[:end_time]
-  #   if date < Time.now || date < new_params[:start_time]
-  #     return false
-  #   end
-  #   true
-  # end
 
 end

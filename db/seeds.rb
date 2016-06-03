@@ -27,7 +27,9 @@ csv.each do |row|
   a.first_name = row[2]
   a.last_name = row[3]
   a.comments = row[4] if row[4].nil? == false
-  a.save(validate: false)
+  a.save(validate: false) # This had to be false because validation
+                          # would prevent new appointments from being scheduled
+                          # in the past
   # p a
   puts "#{a.first_name} #{a.last_name}'s appointment is saved."
   puts "Starts at #{a.start_time} and ends at #{a.end_time}"

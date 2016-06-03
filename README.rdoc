@@ -15,6 +15,66 @@ Things you may want to cover:
 
 * Database initialization
 
+* Using the API
+  - Index/Listing from database
+    > To return a JSON object of all appointments saved in the database, use the URL:
+        http://localhost:3000/appointments ### To change once on heroku
+    > There are a number of criteria that can be added to the params part of the URL
+      to get a JSON object of some specific appointment(s):
+        >> year (four character number; ex: 2016)
+        >> month (one or two character number; ex: 12 (for December))
+        >> day (one or two character number; ex: 21 (for the 21st day of a month))
+        >> hour (one or two character number, 0-23; ex: 22 (for 11:00 PM))
+        >> last_name (lowercase string of last name; ex: "kirksey")
+        >> first_name (lowercase string of first name; ex: "jewell")
+        >> start_time (formatting is very specific)
+            + MUST be formatted like so: "M/D/Y HH:MM" (ex: 11/7/13 10:15)
+            + This formatting was chosen because this is how it dates are stored
+              in appt_data.csv
+        >> end_time (same formatting as start_time)
+    > Any combination of these criteria can be used to refine your returned JSON
+      object, EXCEPT:
+        >> You CANNOT give any of year, month, day, hour AND also give a
+           start_time or end_time. Only one date searching style can be used at
+           a time.
+    > Examples:
+        1. http://localhost:3000/appointments?first_name=brenda
+            + Gives all appointments with first_name of brenda
+        2. http://localhost:3000/appointments?first_name=brenda&last_name=hardy
+            + Gives all appointments with name: brenda hardy
+        3. http://localhost:3000/appointments?year=2013&month=11
+            + Gives all appointments in November 2013
+        4. http://localhost:3000/appointments?year=2013&month=11&day=1
+            + Gives all appointments on November 1, 2013
+        5. http://localhost:3000/appointments?year=2013&month=11&day=1&hour=11
+            + Gives all appointments on November 1, 2013, between 11 AM and 12 noon.
+        6. http://localhost:3000/appointments?month=11
+            + Gives all appointments in November of the current year
+        7. http://localhost:3000/appointments?first_name=brenda&year=2013&month=11
+            + Gives all appointments for anyone with a first name of brenda during
+              November 2013
+        8. http://localhost:3000/appointments?first_name=brenda&start_time=11/1/13 11:00
+            + Gives all appointments for first_name brenda with start time of
+              EXACTLY 11:00 AM on Nov. 1, 2013.
+    > The year/month/day/hour date inputting format is preferred over the
+      start_time/end_time format due to flexibility.
+    > With year/month/day/hour, search will be specific to the most precise time
+      measurement.
+    > start_time/end_time searches will always be specific to the day.
+    > Using year/month/day/hour format will assume the current year/month/day/hour
+      when none is given. See example 6.
+
+  - Creating an appointment
+    > This is done using a POST request to URL: http://localhost:3000/appointments/new
+    > Example:
+      >> curl -i -H "Accept: application/json" -H "Content-Type: application/json" -X POST -d '{"start_time":"6/3/16 3:00","end_time":"6/3/16 3:05", "first_name":"Bill","last_name":"Nye"}' http://localhost:3000/appointments/new
+
+  - Deleting an appointment
+    >
+
+  - Updating an appointment
+    >
+
 * How to run the test suite
 
 * Services (job queues, cache servers, search engines, etc.)
@@ -40,6 +100,7 @@ Dev Notes:
     - List (user sends search params thru url)
       > Search by:
         >> day(s), month(s), year(s), hour(s), today
+        >> Working, ideas?
  * Must return valid json
  * Times must be in the future
  * Times cannot overlap existing appointment on the same day

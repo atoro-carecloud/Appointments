@@ -49,22 +49,22 @@ class AppointmentDateValidator < ActiveModel::Validator
     p "record.start_time: #{appt.start_time}"
     p "record.start_time: #{record.end_time}"
     p "*" * 50
-    if record.start_time >= appt.start_time && record.start_time <= appt.end_time
-      # valid
+    if record.start_time >= appt.start_time && record.start_time < appt.end_time
+      # invalid
       record.errors[:base]  << "Start time occurs during another appointment."
     end
   end
 
   def does_end_time_conflict?(record, appt)
-    if record.end_time >= appt.start_time && record.end_time <= appt.end_time
-      # valid
+    if record.end_time > appt.start_time && record.end_time <= appt.end_time
+      # invalid
       record.errors[:base] << "End time occurs during another appointment."
     end
   end
 
   def do_times_surround_another?(record, appt)
     if record.start_time <= appt.start_time && record.end_time >= appt.end_time
-      # valid
+      # invalid
       record.errors[:base] << "Times overlap another appointment."
     end
   end
