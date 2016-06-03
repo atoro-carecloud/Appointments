@@ -10,6 +10,7 @@ class Appointment < ActiveRecord::Base
     DateTime.strptime(self.start_time, '%m/%d/%Y %H:%M')
   end
 
+
   def set_date_search_variables(appt_params)
 
     @search_spec = get_date_search_specificity(appt_params)
@@ -23,12 +24,8 @@ class Appointment < ActiveRecord::Base
     set_beg_end_dates
 
     appt_params[:start_time] = @date_range
-    appt_params[:end_time] = @date_range
-    appt_params.delete(:hour) if !appt_params[:hour].nil?
-    appt_params.delete(:day) if !appt_params[:day].nil?
-    appt_params.delete(:month) if !appt_params[:month].nil?
-    appt_params.delete(:year) if !appt_params[:year].nil?
-    appt_params
+
+    delete_unsearchable_params(appt_params)
   end
 
   def set_beg_times_initial
@@ -91,7 +88,7 @@ class Appointment < ActiveRecord::Base
 
   def set_beg_end_dates
     @beg_date = DateTime.new(@beg_year, @beg_month, @beg_day, @beg_hour)
-    @end_date = DateTime.new(@end_year, @end_month, @end_day, @end_hour)
+    @end_date = DateTime.new(@end_year, @end_month, @end_day, @end_hour) - 1.seconds
     @date_range = @beg_date..@end_date
   end
 
@@ -107,4 +104,11 @@ class Appointment < ActiveRecord::Base
     end
   end
 
+  def delete_unsearchable_params(appt_params)
+    appt_params.delete(:hour) if !appt_params[:hour].nil?
+    appt_params.delete(:day) if !appt_params[:day].nil?
+    appt_params.delete(:month) if !appt_params[:month].nil?
+    appt_params.delete(:year) if !appt_params[:year].nil?
+    appt_params
+  end
 end
