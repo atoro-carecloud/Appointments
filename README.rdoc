@@ -35,12 +35,15 @@ Dev Notes:
                      -H "Content-Type: application/json" \
                      -X POST -d '{"start_time":"11/7/17 13:30","end_time":"11/7/17 13:40", "first_name":"Bill","last_name":"Golik"}' \
                      http://localhost:3000/appointments
-    - Update (user sends curl post request)
-    - Delete (user sends curl post request)
+    - Update (user sends curl post (patch?) request)
+    - Delete (user sends curl delete request)
     - List (user sends search params thru url)
+      > Search by:
+        >> day(s), month(s), year(s), hour(s), today
  * Must return valid json
  * Times must be in the future
  * Times cannot overlap existing appointment on the same day
 
 To Do:
  * Limit length of newly created appointments (2 hrs?)
+ * Limit times of new appointments to work hours

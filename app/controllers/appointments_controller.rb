@@ -3,15 +3,7 @@ class AppointmentsController < ApplicationController
   # Worried about security of this line!
 
   def list
-    if appt_params[:last_name]
-      @appointments = Appointment.where(last_name: appt_params[:last_name])
-      #
-      # Pick up here!
-      # Keep writing search stuff for json results!
-      #
-    else
-      @appointments = Appointment.all
-    end
+    @appointments = Appointment.where(Appointment.new.set_date_search_variables(appt_params))
     render json: @appointments
   end
 
@@ -69,7 +61,8 @@ class AppointmentsController < ApplicationController
 
   private
   def appt_params
-    params.permit(:first_name, :last_name, :start_time, :end_time, :comments)
+    params.permit(:first_name, :last_name, :start_time, :end_time, :comments,
+                  :hour, :day, :month, :year, :week)
   end
 
   def reformat_params_date
