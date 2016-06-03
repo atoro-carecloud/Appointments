@@ -3,7 +3,11 @@ class AppointmentsController < ApplicationController
   # Worried about security of this line!
 
   def list
-    @appointments = Appointment.where(Appointment.new.set_date_search_variables(appt_params))
+    if appt_params == {}
+      @appointments = Appointment.all
+    else
+      @appointments = Appointment.where(Appointment.new.set_date_search_variables(appt_params))
+    end
     render json: @appointments
   end
 

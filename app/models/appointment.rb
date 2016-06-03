@@ -12,23 +12,31 @@ class Appointment < ActiveRecord::Base
 
 # Problem here where first_name search, start_date search do not work.
 # At least in that first case, it DOES work when some dates are included.
+# Also displays empty JSON when no criteria are given
 # Work on this!
-
 
   def set_date_search_variables(appt_params)
 
+    # Determine most specific time search criteria
     @search_spec = get_date_search_specificity(appt_params)
 
+    # Set default beg_times
     set_beg_times_initial
+    # Reset beg_times if params are given
     replace_beg_times_with_params(appt_params)
 
+    # Set default end_times
     set_end_times_initial
+    # Reset end_times if params are given
     adjust_times_on_search_spec
 
+    # Creates date objects and range of those objects
     set_beg_end_dates
 
+    # Pushes date_range back into appt_params
     appt_params[:start_time] = @date_range
 
+    # Removes params not in database and returns appt_params
     delete_unsearchable_params(appt_params)
   end
 
