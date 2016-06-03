@@ -10,6 +10,10 @@ class Appointment < ActiveRecord::Base
     DateTime.strptime(self.start_time, '%m/%d/%Y %H:%M')
   end
 
+# Problem here where first_name search, start_date search do not work.
+# At least in that first case, it DOES work when some dates are included.
+# Work on this!
+
 
   def set_date_search_variables(appt_params)
 
@@ -83,6 +87,15 @@ class Appointment < ActiveRecord::Base
       @beg_month = 1
       @end_month = 1
       @end_year = @beg_year + 1
+    else
+      if @beg_day == Time.days_in_month(@beg_month, @beg_year)
+        @end_day = 1
+        @end_month = @end_month + 1
+      else
+        @end_day = @beg_day + 1
+      end
+      @beg_hour = 0
+      @end_hour = 0
     end
   end
 
