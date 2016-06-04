@@ -10,14 +10,14 @@ class Appointment < ActiveRecord::Base
     DateTime.strptime(self.start_time, '%m/%d/%Y %H:%M')
   end
 
-  def set_date_search_variables(appt_params)
+  def set_date_search_variables(all_allowed_params)
     # Determine most specific time search criteria
-    @search_spec = get_date_search_specificity(appt_params)
+    @search_spec = get_date_search_specificity(all_allowed_params)
 
     # Set default beg_times
     set_beg_times_initial
     # Reset beg_times if params are given
-    replace_beg_times_with_params(appt_params)
+    replace_beg_times_with_params(all_allowed_params)
 
     # Set default end_times
     set_end_times_initial
@@ -28,20 +28,20 @@ class Appointment < ActiveRecord::Base
     set_beg_end_dates
 
     p "*" * 50
-    p "appt_params: #{appt_params}"
+    p "all_allowed_params: #{all_allowed_params}"
     p "*" * 50
-    # Pushes date_range back into appt_params if params were given
+    # Pushes date_range back into all_allowed_params if params were given
 
-    if(appt_params[:min] ||
-      appt_params[:hour] ||
-      appt_params[:day] ||
-      appt_params[:month] ||
-      appt_params[:year])
-      appt_params[:start_time] = @date_range
-      # appt_params[:end_time] = @date_range
+    if(all_allowed_params[:min] ||
+      all_allowed_params[:hour] ||
+      all_allowed_params[:day] ||
+      all_allowed_params[:month] ||
+      all_allowed_params[:year])
+      all_allowed_params[:start_time] = @date_range
+      # all_allowed_params[:end_time] = @date_range
     end
-    # Removes params not in database and returns appt_params
-    delete_unsearchable_params(appt_params)
+    # Removes params not in database and returns all_allowed_params
+    delete_unsearchable_params(all_allowed_params)
     ### Problem is that search will limit to today if there are no date params
   end
 
@@ -54,12 +54,12 @@ class Appointment < ActiveRecord::Base
     @beg_year = now.year
   end
 
-  def replace_beg_times_with_params(appt_params)
-    @beg_min = appt_params[:min].to_i if appt_params[:min]
-    @beg_hour = appt_params[:hour].to_i if appt_params[:hour]
-    @beg_day = appt_params[:day].to_i if appt_params[:day]
-    @beg_month = appt_params[:month].to_i if appt_params[:month]
-    @beg_year = appt_params[:year].to_i if appt_params[:year]
+  def replace_beg_times_with_params(all_allowed_params)
+    @beg_min = all_allowed_params[:min].to_i if all_allowed_params[:min]
+    @beg_hour = all_allowed_params[:hour].to_i if all_allowed_params[:hour]
+    @beg_day = all_allowed_params[:day].to_i if all_allowed_params[:day]
+    @beg_month = all_allowed_params[:month].to_i if all_allowed_params[:month]
+    @beg_year = all_allowed_params[:year].to_i if all_allowed_params[:year]
   end
 
   def set_end_times_initial
@@ -151,12 +151,12 @@ class Appointment < ActiveRecord::Base
     end
   end
 
-  def delete_unsearchable_params(appt_params)
-    appt_params.delete(:min) if !appt_params[:min].nil?
-    appt_params.delete(:hour) if !appt_params[:hour].nil?
-    appt_params.delete(:day) if !appt_params[:day].nil?
-    appt_params.delete(:month) if !appt_params[:month].nil?
-    appt_params.delete(:year) if !appt_params[:year].nil?
-    appt_params
+  def delete_unsearchable_params(all_allowed_params)
+    all_allowed_params.delete(:min) if !all_allowed_params[:min].nil?
+    all_allowed_params.delete(:hour) if !all_allowed_params[:hour].nil?
+    all_allowed_params.delete(:day) if !all_allowed_params[:day].nil?
+    all_allowed_params.delete(:month) if !all_allowed_params[:month].nil?
+    all_allowed_params.delete(:year) if !all_allowed_params[:year].nil?
+    all_allowed_params
   end
 end

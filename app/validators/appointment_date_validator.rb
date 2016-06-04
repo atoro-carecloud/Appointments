@@ -46,8 +46,8 @@ class AppointmentDateValidator < ActiveModel::Validator
   def does_start_time_conflict?(record, appt)
     p "*" * 50
     p "record.start_time: #{record.start_time}"
-    p "record.start_time: #{appt.start_time}"
-    p "record.start_time: #{record.end_time}"
+    p "appt.start_time: #{appt.start_time}"
+    p "record.end_time: #{record.end_time}"
     p "*" * 50
     if record.start_time >= appt.start_time && record.start_time < appt.end_time
       # invalid
