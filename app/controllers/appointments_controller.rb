@@ -30,7 +30,12 @@ class AppointmentsController < ApplicationController
   end
 
   def create
+    p "method_create_params #{create_params}"
     create_params = reformat_params_date
+    # p "create" * 20
+    # p create_params
+    # p "create" * 20
+    # p @create_success
     if @create_success
       @appointment = Appointment.new(create_params)
       if @appointment.save
@@ -99,17 +104,24 @@ class AppointmentsController < ApplicationController
   end
 
   def create_params
-    params.permit(:first_name, :last_name, :start_time, :end_time, :comments)
+    reformat_params_date.permit(:first_name, :last_name, :start_time, :end_time, :comments)
   end
 
   def reformat_params_date
     @create_success = true
-    new_params = validate_times
+    new_params = appt_params
+    p "&" * 50
+    p new_params
+    p "&" * 50
     begin
-      new_params[:start_time] = DateTime
-        .strptime(new_params[:start_time], '%m/%d/%Y %H:%M') + 2000.years
-      new_params[:end_time] = DateTime
-        .strptime(new_params[:end_time], '%m/%d/%Y %H:%M') + 2000.years
+      if new_params[:start_time]
+        new_params[:start_time] = DateTime
+          .strptime(new_params[:start_time], '%m/%d/%Y %H:%M') + 2000.years
+      end
+      if new_params[:start_time]
+        new_params[:end_time] = DateTime
+          .strptime(new_params[:end_time], '%m/%d/%Y %H:%M') + 2000.years
+      end
       return new_params
     rescue
       @create_success = false
