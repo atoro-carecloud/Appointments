@@ -130,8 +130,12 @@ class Appointment < ActiveRecord::Base
 
   def set_beg_end_dates
     begin
-      @beg_date = DateTime.new(@beg_year, @beg_month, @beg_day, @beg_hour, @beg_min)
-      @end_date = DateTime.new(@end_year, @end_month, @end_day, @end_hour, @end_min) - 1.seconds
+
+      # TESTING to see whether this will fix time zone issues
+      # Keep working here!!!
+
+      @beg_date = DateTime.new(@beg_year, @beg_month, @beg_day, @beg_hour, @beg_min, 0, 'EST')
+      @end_date = DateTime.new(@end_year, @end_month, @end_day, @end_hour, @end_min, 0, 'EST') - 1.seconds
       @date_range = @beg_date..@end_date
     rescue
       render status: 422, json: {

@@ -134,3 +134,5 @@ To Do:
  * Limit length of newly created appointments (2 hrs?)
  * Limit times of new appointments to work hours
  * Put minimum length for newly created appointments
+ * Save everything lowercase, search should be lowercased
+ * Change from UTC to EST everywhere.

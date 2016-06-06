@@ -1,0 +1,55 @@
+Tests 6/5/16
+
+(Run using Postman)
+
+GET http://localhost:3000/
+> Should return all appointments in json
+> SUCCESS
+GET http://localhost:3000/appointments
+> Should return all appointments in json
+> SUCCESS
+
+GET http://localhost:3000?first_name=dawn
+> Should return all appointments with first name 'dawn'
+> SUCCESS
+
+GET http://localhost:3000?last_name=robins
+> Should return all appointments (one in this case) with last name 'robins'
+> SUCCESS
+
+GET http://localhost:3000?first_name=dawn&last_name=robins
+> Should return all appointments (one in this case) with the name 'dawn robins'
+> SUCCESS
+
+GET http://localhost:3000?first_name=dawn&last_name=Robins
+> Testing if capital letters throw off the search
+> Should return all appointments (one in this case) with the name 'dawn robins'
+> SUCCESS
+
+GET http://localhost:3000?first_name=dawn&last_name=robins&m=list
+> Should list by default but should still list if declared explicitly
+> Should return all appointments (one in this case) with the name 'dawn robins'
+> SUCCESS
+
+### Testing Note
+###
+### I'm switching over to testing the create method so that I can have appointments
+### in different months and years than the provided appointment data. I need that
+### data to properly test my year and month searches.
+
+### Why are they all GET requests?
+###
+### I set up my code to use GET requests for all four of the CLUD methods. I wanted
+### this API to be as user-friendly as possible and I felt that would best be done
+### by asking the user to choose the method in the URL params rather than a more
+### complicated cURL request.
+
+GET http://localhost:3000?m=create&first_name=mike&last_name=gregory&start_time=6/5/16 11:30&end_time=6/5/16 11:45
+> Expected to create new appointment
+++++++ F A I L U R E
+> Error1: "Start time is either (a) not properly formatted, or (b) in the past."
+> Error2: "End time is either (a) not properly formatted, or (b) in the past."
+  >> Validation worked correctly; test was run at 11:13 PM, but appointment was
+     being created at 11:30 AM.
+
+GET http://localhost:3000?m=create&first_name=mike&last_name=gregory&start_time=6/6/16 9:30&end_time=6/6/16 10:00

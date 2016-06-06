@@ -29,6 +29,9 @@ class AppointmentsController < ApplicationController
   def create
     find_appointments
     one_appointment
+    create_params = reformat_params_date(basic_params)
+    create_params[:first_name].downcase!
+    create_params[:last_name].downcase!
     @appointment = Appointment.new(reformat_params_date(basic_params))
     p @appointment
     if @appointment.save
@@ -125,11 +128,14 @@ class AppointmentsController < ApplicationController
 
   # New methods (after refactoring) ----------------------------------------->
   def find_appointments # Good for list, update, destroy
-    p search_params
+    search_params_hash = search_params
     if search_params == {}
       @appointments = Appointment.all
     else
+      search_params_hash[:first_name].downcase!
+      search_params_hash[:last_name].downcase!
       @search_range = Appointment.new.set_date_search_variables(search_params)
+      if_start_end_time_search_adj_time_zone
       @appointments = Appointment.where(@search_range)
     end
   end
@@ -156,6 +162,20 @@ class AppointmentsController < ApplicationController
     hash_w_start_end_times
   end
 
+  def if_start_end_time_search_adj_time_zone
+    unless @search_range[:start_time].class == Range
+      if @search_range[:start_time]
+        @search_range[:start_time] = adj_from_EST_to_UTC(@search_range[:start_time])
+      end
+      if @search_range[:end_time]
+        @search_range[:end_time] = adj_from_EST_to_UTC(@search_range[:end_time])
+      end
+    end
+  end
+
+  def adj_from_EST_to_UTC(input_time_string)
+    reformat_date(input_time_string).utc
+  end
   # New methods (after refactoring) ----------------------------------------->
 
 
@@ -186,7 +206,7 @@ class AppointmentsController < ApplicationController
   end
 
   def reformat_date(date_user_input_format)
-    DateTime.strptime(date_user_input_format, '%m/%d/%Y %H:%M') + 2000.years
+    DateTime.strptime("#{date_user_input_format} EST", '%m/%d/%Y %H:%M %Z') + 2000.years
   end
 
   # Params organization section ----------------------------------------->

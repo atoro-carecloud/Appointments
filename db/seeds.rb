@@ -22,10 +22,10 @@ p csv
 csv.each do |row|
   # p row
   a = Appointment.new
-  a.start_time = DateTime.strptime(row[0], '%m/%d/%Y %H:%M') + 2000.years
-  a.end_time = DateTime.strptime(row[1], '%m/%d/%Y %H:%M') + 2000.years
-  a.first_name = row[2]
-  a.last_name = row[3]
+  a.start_time = DateTime.strptime("#{row[0]} EST", '%m/%d/%Y %H:%M %Z') + 2000.years
+  a.end_time = DateTime.strptime("#{row[1]} EST", '%m/%d/%Y %H:%M %Z') + 2000.years
+  a.first_name = row[2].downcase
+  a.last_name = row[3].downcase
   a.comments = row[4] if row[4].nil? == false
   a.save(validate: false) # This had to be false because validation
                           # would prevent new appointments from being scheduled
