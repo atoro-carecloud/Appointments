@@ -16,8 +16,8 @@ class AppointmentsController < ApplicationController
   end
 
   def list
-    find_appointments
     begin
+      find_appointments
       render json: @appointments
     rescue
       render status: 422, json: {
@@ -134,7 +134,7 @@ class AppointmentsController < ApplicationController
     else
       search_params_hash[:first_name].downcase!
       search_params_hash[:last_name].downcase!
-      @search_range = Appointment.new.set_date_search_variables(search_params)
+      @search_range = Appointment.new.set_date_search_variables(search_params_hash)
       if_start_end_time_search_adj_time_zone
       @appointments = Appointment.where(@search_range)
     end

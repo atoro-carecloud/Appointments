@@ -52,4 +52,11 @@ GET http://localhost:3000?m=create&first_name=mike&last_name=gregory&start_time=
   >> Validation worked correctly; test was run at 11:13 PM, but appointment was
      being created at 11:30 AM.
 
-GET http://localhost:3000?m=create&first_name=mike&last_name=gregory&start_time=6/6/16 9:30&end_time=6/6/16 10:00
+GET http://localhost:3000?m=create&first_name=mike&last_name=gregory&start_time=6/10/16 9:30&end_time=6/10/16 10:00
+> Expected appointment to be created with dates saved in UTC correctly
+> Used same request with change from 'm=create' to 'm=list' in order to test that creation was successful
+> DateTime & timezone issues appear resolved
+> SUCCESS
+
+Testing for: Invalid date in start_time
+GET http://localhost:3000?m=list&first_name=mike&last_name=gregory&start_time=6/100/16 9:30&end_time=6/10/16 10:00
