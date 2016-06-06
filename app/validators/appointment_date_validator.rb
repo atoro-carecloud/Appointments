@@ -4,7 +4,13 @@ class AppointmentDateValidator < ActiveModel::Validator
     set_appointments_to_test_against
     p "@" * 50
     p @upcoming_appts
+    p "record: #{record}"
+    p record
     p "@" * 50
+
+    # Left off here, testing create again. Getting error on record being nil in
+    # is_start_time_formatted method
+
     is_start_time_formatted?(record)
     is_end_time_formatted?(record)
     is_end_after_start?(record)

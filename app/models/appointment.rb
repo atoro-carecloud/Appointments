@@ -27,9 +27,6 @@ class Appointment < ActiveRecord::Base
     # Creates date objects and range of those objects
     set_beg_end_dates
 
-    p "*" * 50
-    p "all_allowed_params: #{all_allowed_params}"
-    p "*" * 50
     # Pushes date_range back into all_allowed_params if params were given
 
     if(all_allowed_params[:min] ||
@@ -132,9 +129,15 @@ class Appointment < ActiveRecord::Base
   end
 
   def set_beg_end_dates
-    @beg_date = DateTime.new(@beg_year, @beg_month, @beg_day, @beg_hour, @beg_min)
-    @end_date = DateTime.new(@end_year, @end_month, @end_day, @end_hour, @end_min) - 1.seconds
-    @date_range = @beg_date..@end_date
+    begin
+      @beg_date = DateTime.new(@beg_year, @beg_month, @beg_day, @beg_hour, @beg_min)
+      @end_date = DateTime.new(@end_year, @end_month, @end_day, @end_hour, @end_min) - 1.seconds
+      @date_range = @beg_date..@end_date
+    rescue
+      render status: 422, json: {
+        error: "Invalid date format. Please format: m/d/yy h:mm"
+      }.to_json
+    end
   end
 
   def get_date_search_specificity(params)
