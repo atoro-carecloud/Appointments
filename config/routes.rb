@@ -2,8 +2,8 @@ Rails.application.routes.draw do
 
   resources :appointments, except: [:index, :new, :create]
   post 'appointments/new' => 'appointments#create', as: :new_appointment
-  root 'appointments#crud_master'
-  get 'appointments/' => 'appointments#crud_master', as: :api_master
+  root 'appointments#clud_master'
+  get 'appointments/' => 'appointments#clud_master', as: :api_master
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
