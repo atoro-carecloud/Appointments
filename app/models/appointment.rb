@@ -7,10 +7,14 @@ class Appointment < ActiveRecord::Base
   # <A----------------------- Search Method -------------------------------->
   def self.set_appointments_if_params(some_params)
     if some_params == {}
+      # If no params then return all appointments
       find_appointments_all
     else
+      # Downcase names for searching and determine which time search is used
       some_params = downcase_first_last_names_hash(some_params)
       time_search_method = which_time_search_method?(some_params)
+
+      # Run that time search, passing the params
       send time_search_method, some_params
     end
   end
@@ -40,15 +44,44 @@ class Appointment < ActiveRecord::Base
       # <A2-------------- main time_search_methods ------------------------->
   def self.prepare_and_run_var_time_search(some_params)
     date_params_keys = [:year, :month, :day, :hour, :min]
+
+    # param_spec will be an array of symbols from the broadest unit to the most
+    # specific unit that the user searched for
+    # ex: if the user searches for year and month, param_spec will be [:year, :month]
+    # this process is so that the user can better control how specific the search is
+
     param_spec = get_search_time_specificity(some_params, date_params_keys)
     some_params = convert_var_time_search_vals_to_i(some_params, date_params_keys)
-    beg_times = set_date_hash_to_datetime(date_params_keys, {}, DateTime.now)
-    beg_times = replace_date_hash_w_params(beg_times, some_params)
-    beg_times = adjust_date_hash_by_specificity(end_times, param_spec, 'beg')
-    end_times = adjust_date_hash_by_specificity(end_times, param_spec, 'end')
-    end_times = beg_times
-    p "&*" * 35
-    p beg_times
+
+    # Set beg_time_hash to today and replace with params
+    beg_time_hash = set_date_hash_to_datetime(date_params_keys, {}, DateTime.now)
+    beg_time_hash = replace_date_hash_w_params(beg_time_hash, some_params)
+
+    # Set end_time_hash from beg_time
+    end_time_hash = beg_time_hash.clone
+
+    # Adjust time hashes to beginning and end of day
+    end_time_hash = adjust_date_hash_by_specificity(end_time_hash, param_spec, 'end')
+    beg_time_hash = adjust_date_hash_by_specificity(beg_time_hash, param_spec, 'beg')
+
+    # Convert time hashes to datetimes
+    end_time_dt = convert_date_hash_to_dt(end_time_hash, 59)
+    beg_time_dt = convert_date_hash_to_dt(beg_time_hash)
+
+    # Create range of datetimes
+    datetime_range = beg_time_dt..end_time_dt
+
+    # Clean params for running search
+    p some_params
+    some_params = trim_to_search_params_only(some_params)
+    some_params[:start_time] = datetime_range
+    p some_params
+
+    p "$%" * 35
+    p datetime_range
+    p "$%" * 35
+
+    return where(some_params)
   end
 
   def self.prepare_and_run_fix_time_search(some_params)
@@ -59,6 +92,7 @@ class Appointment < ActiveRecord::Base
   def self.prepare_and_run_no_time_search(some_params)
     return where(some_params)
   end
+
         # <A2a----------- support time_search_methods ---------------------->
   def self.convert_var_time_search_vals_to_i(some_params, date_params_keys)
     date_params_keys.each do |x|
@@ -91,23 +125,31 @@ class Appointment < ActiveRecord::Base
   def self.adjust_date_hash_by_specificity(date_hash, specificity, beg_or_end)
     date_hash.each do |k, v|
       if !specificity.include?(k)
-        if k == :month || k == :day
-          if beg_or_end == 'beg'
-            date_hash[k] = 1
+        date_hash[k] =
+          if beg_or_end == 'beg' && (k == :month || k == :day)
+            1
+          elsif beg_or_end == 'beg' && (k == :hour || k == :min)
+            0
           elsif beg_or_end == 'end'
-            # date_hash[k] =
-            # Keep working here
-            #
-            #
-            #
-            # 
+            if k == :month
+              12
+            elsif k == :day
+              Time.days_in_month(date_hash[:month], date_hash[:year])
+            elsif k == :hour
+              23
+            elsif k == :min
+              59
+            end
           end
-        elsif k == :hour || k == :min
-          date_hash[k] = 0 if beg_or_end == 'beg'
-        end
+        # Indentation off due to variable setting if conditional
+        # What's best practice here?
       end
     end
     date_hash
+  end
+
+  def self.trim_to_search_params_only(some_params)
+    some_params.slice(:first_name, :last_name, :comments, :start_time)
   end
 
 # <----------------------- Date Manipulation Methods ------------------------->
@@ -120,6 +162,11 @@ class Appointment < ActiveRecord::Base
       some_params[x] = convert_date_str_to_dt(some_params[x]) if !some_params[x].nil?
     end
     some_params
+  end
+
+  def self.convert_date_hash_to_dt(date_hash, seconds = 0)
+    x = date_hash
+    DateTime.new(x[:year], x[:month], x[:day], x[:hour], x[:min], seconds, 'EST')
   end
 
   def self.set_date_hash_to_datetime(date_params_keys, date_hash = {},
