@@ -27,19 +27,36 @@ class AppointmentsController < ApplicationController
   end
 
   def create
+    @current_errors = []
     find_appointments
     one_appointment
-    create_params = reformat_params_date(basic_params)
-    create_params[:first_name].downcase!
-    create_params[:last_name].downcase!
-    @appointment = Appointment.new(reformat_params_date(basic_params))
-    p @appointment
-    if @appointment.save
+    begin
+      create_params = reformat_params_date(basic_params)
+      create_params[:first_name].downcase!
+      create_params[:last_name].downcase!
+      p "create_params:"
+      p create_params
+      @appointment = Appointment.new(create_params)
+      p "appointment in create method:"
+      p @appointment
+      appt_saved = @appointment.save
+    rescue
+      appt_saved = "error"
+    end
+    p "&*" * 30
+    p "appt_saved:"
+    p appt_saved
+    p "&*" * 30
+    if appt_saved == "error"
+      render status: 422, json: {
+        error: "Invalid date or date format. Please use format: m/d/yy h:mm"
+      }.to_json
+    elsif appt_saved == true
       render status: 200, json: {
         message: "Successfully created appointment",
         appointment: @appointment
       }.to_json
-    else
+    elsif appt_saved == false
       render status: 422, json: {
         errors: @appointment.errors
       }.to_json
@@ -132,9 +149,10 @@ class AppointmentsController < ApplicationController
     if search_params == {}
       @appointments = Appointment.all
     else
-      search_params_hash[:first_name].downcase!
-      search_params_hash[:last_name].downcase!
+      search_params_hash[:first_name].downcase! if search_params_hash[:first_name]
+      search_params_hash[:last_name].downcase! if search_params_hash[:last_name]
       @search_range = Appointment.new.set_date_search_variables(search_params_hash)
+      p @search_range
       if_start_end_time_search_adj_time_zone
       @appointments = Appointment.where(@search_range)
     end
@@ -151,30 +169,33 @@ class AppointmentsController < ApplicationController
   end
 
   def reformat_params_date(hash_w_start_end_times)
-    begin
+    if hash_w_start_end_times[:start_time] && @current_errors == []
       hash_w_start_end_times[:start_time] = reformat_date(hash_w_start_end_times[:start_time])
+    end
+    if hash_w_start_end_times[:end_time] && @current_errors == []
       hash_w_start_end_times[:end_time] = reformat_date(hash_w_start_end_times[:end_time])
-    rescue
-      render status: 422, json: {
-        error: "Invalid date format. Please format: m/d/yy h:mm"
-      }.to_json
     end
     hash_w_start_end_times
   end
 
   def if_start_end_time_search_adj_time_zone
     unless @search_range[:start_time].class == Range
-      if @search_range[:start_time]
-        @search_range[:start_time] = adj_from_EST_to_UTC(@search_range[:start_time])
-      end
-      if @search_range[:end_time]
-        @search_range[:end_time] = adj_from_EST_to_UTC(@search_range[:end_time])
+      begin
+        if @search_range[:start_time] && @current_errors = []
+          @search_range[:start_time] = adj_from_EST_to_UTC(@search_range[:start_time])
+        end
+        if @search_range[:end_time] && @current_errors = []
+          @search_range[:end_time] = adj_from_EST_to_UTC(@search_range[:end_time])
+        end
+      rescue
+        @current_errors << "Invalid date or time. Please use format: m/d/yy h:mm"
       end
     end
   end
 
   def adj_from_EST_to_UTC(input_time_string)
-    reformat_date(input_time_string).utc
+    p @current_errors
+    reformat_date(input_time_string).utc if @current_errors == []
   end
   # New methods (after refactoring) ----------------------------------------->
 
@@ -206,7 +227,14 @@ class AppointmentsController < ApplicationController
   end
 
   def reformat_date(date_user_input_format)
-    DateTime.strptime("#{date_user_input_format} EST", '%m/%d/%Y %H:%M %Z') + 2000.years
+    p "%^" * 30
+    p date_user_input_format
+    p "%^" * 30
+    begin
+      DateTime.strptime("#{date_user_input_format} EST", '%m/%d/%Y %H:%M %Z') + 2000.years
+    rescue
+      @current_errors << "Invalid date or time. Please use format: m/d/yy h:mm"
+    end
   end
 
   # Params organization section ----------------------------------------->

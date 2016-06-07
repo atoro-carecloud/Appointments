@@ -2,15 +2,6 @@ class AppointmentDateValidator < ActiveModel::Validator
 
   def validate(record)
     set_appointments_to_test_against
-    p "@" * 50
-    p @upcoming_appts
-    p "record: #{record}"
-    p record
-    p "@" * 50
-
-    # Left off here, testing create again. Getting error on record being nil in
-    # is_start_time_formatted method
-
     is_start_time_formatted?(record)
     is_end_time_formatted?(record)
     is_end_after_start?(record)
@@ -19,9 +10,6 @@ class AppointmentDateValidator < ActiveModel::Validator
       does_end_time_conflict?(record, appt)
       do_times_surround_another?(record, appt)
     end
-    p "$" * 50
-    p record.errors[:base]
-    p "$" * 50
   end
 
   def set_appointments_to_test_against

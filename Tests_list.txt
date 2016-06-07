@@ -2,30 +2,38 @@ Tests 6/5/16
 
 (Run using Postman)
 
+Testing for: (m=list) Root lists all appointments
 GET http://localhost:3000/
 > Should return all appointments in json
 > SUCCESS
+
+Testing for: (m=list) '/appointments' lists all appointments
 GET http://localhost:3000/appointments
 > Should return all appointments in json
 > SUCCESS
 
+Testing for: (m=list) Search by first_name works
 GET http://localhost:3000?first_name=dawn
 > Should return all appointments with first name 'dawn'
 > SUCCESS
 
+Testing for: (m=list) Search by last_name works
 GET http://localhost:3000?last_name=robins
 > Should return all appointments (one in this case) with last name 'robins'
 > SUCCESS
 
+Testing for: (m=list) Search by first_name & last_name works
 GET http://localhost:3000?first_name=dawn&last_name=robins
 > Should return all appointments (one in this case) with the name 'dawn robins'
 > SUCCESS
 
+Testing for: (m=list) Search with capitalized name still works
 GET http://localhost:3000?first_name=dawn&last_name=Robins
 > Testing if capital letters throw off the search
 > Should return all appointments (one in this case) with the name 'dawn robins'
 > SUCCESS
 
+Testing for: (m=list) Explicitly choosing list method works
 GET http://localhost:3000?first_name=dawn&last_name=robins&m=list
 > Should list by default but should still list if declared explicitly
 > Should return all appointments (one in this case) with the name 'dawn robins'
@@ -41,22 +49,27 @@ GET http://localhost:3000?first_name=dawn&last_name=robins&m=list
 ###
 ### I set up my code to use GET requests for all four of the CLUD methods. I wanted
 ### this API to be as user-friendly as possible and I felt that would best be done
-### by asking the user to choose the method in the URL params rather than a more
-### complicated cURL request.
+### by asking the user to choose the method in the same way they list the URL params
+### rather than requiring the user to know how to use cURL/Postman/HTTParty.
 
-GET http://localhost:3000?m=create&first_name=mike&last_name=gregory&start_time=6/5/16 11:30&end_time=6/5/16 11:45
-> Expected to create new appointment
-++++++ F A I L U R E
-> Error1: "Start time is either (a) not properly formatted, or (b) in the past."
-> Error2: "End time is either (a) not properly formatted, or (b) in the past."
-  >> Validation worked correctly; test was run at 11:13 PM, but appointment was
-     being created at 11:30 AM.
-
+Testing for: (m=create) Dates are converted and saved correctly, explicitly choosing create method works
 GET http://localhost:3000?m=create&first_name=mike&last_name=gregory&start_time=6/10/16 9:30&end_time=6/10/16 10:00
 > Expected appointment to be created with dates saved in UTC correctly
 > Used same request with change from 'm=create' to 'm=list' in order to test that creation was successful
 > DateTime & timezone issues appear resolved
 > SUCCESS
 
-Testing for: Invalid date in start_time
+Testing for: (m=list) Invalid date in start_time
 GET http://localhost:3000?m=list&first_name=mike&last_name=gregory&start_time=6/100/16 9:30&end_time=6/10/16 10:00
+> Returns error about incorrect date_format
+> Successful Failure
+
+Testing for: (m=create) Capital names are saved downcase
+GET http://localhost:3000?m=create&first_name=Mike&last_name=Gregory&start_time=6/10/16 10:00&end_time=6/10/16 10:30
+> Saved as downcase
+> SUCCESS
+
+Testing for: (m=create) Not all data given by user should result in 422
+GET http://localhost:3000?m=create&first_name=Mike&last_name=Gregory&start_time=6/10/16 10:30
+> Gives invalid date error and 422
+> SUCCESS
