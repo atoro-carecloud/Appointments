@@ -72,14 +72,8 @@ class Appointment < ActiveRecord::Base
     datetime_range = beg_time_dt..end_time_dt
 
     # Clean params for running search
-    p some_params
     some_params = trim_to_search_params_only(some_params)
     some_params[:start_time] = datetime_range
-    p some_params
-
-    p "$%" * 35
-    p datetime_range
-    p "$%" * 35
 
     return where(some_params)
   end
@@ -152,7 +146,47 @@ class Appointment < ActiveRecord::Base
     some_params.slice(:first_name, :last_name, :comments, :start_time)
   end
 
-# <----------------------- Date Manipulation Methods ------------------------->
+# <B----------------------- Create Method -------------------------------->
+
+  def self.create_appointment(some_params, errors)
+    some_params = downcase_first_last_names_hash(some_params)
+    errors = validate_convert_params_str_dates(some_params, errors)
+    some_params = validate_convert_params_str_dates(some_params, errors, 'convert')
+    p "%^" * 40
+    p "create_params"
+    p some_params
+    appointment = new(some_params)
+    begin
+      appointment.save
+    rescue
+      errors << "Error: Appointment could not be saved."
+    end
+    return appointment, errors
+  end
+
+  def self.validate_convert_params_str_dates(some_params, errors, which_method = nil)
+    date_input_format = '%m/%d/%Y %H:%M %Z'
+    p which_method
+    begin
+      if which_method == 'convert'
+        some_params[:start_time] =
+          DateTime.strptime("#{some_params[:start_time]} EST", date_input_format) + 2000.years
+        some_params[:end_time] =
+          DateTime.strptime("#{some_params[:end_time]} EST", date_input_format) + 2000.years
+      end
+          p "*" * 15 + " this works!"
+          p errors
+    rescue
+      errors << "Error: Invalid date or date format."
+    end
+    if which_method == 'convert'
+      return some_params
+    else
+      return errors
+    end
+  end
+
+  # <----------------------- Date Manipulation Methods ------------------------->
   def self.convert_date_str_to_dt(str_time)
     DateTime.strptime("#{str_time} EST", '%m/%d/%Y %H:%M %Z') + 2000.years
   end
@@ -170,7 +204,7 @@ class Appointment < ActiveRecord::Base
   end
 
   def self.set_date_hash_to_datetime(date_params_keys, date_hash = {},
-                                     datetime = DateTime.now)
+    datetime = DateTime.now)
     date_params_keys.each do |x|
       date_hash[x] = datetime.send x.to_sym
     end
@@ -187,5 +221,6 @@ class Appointment < ActiveRecord::Base
       break if x == specificity
     end
   end
+
 
 end # Final End

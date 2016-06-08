@@ -21,14 +21,23 @@ class AppointmentsController < ApplicationController
     list_params = search_params
     appointments = Appointment.set_appointments_if_params(list_params)
 
-    if errors == [] # replace with some error logic here
-      render json: appointments
+    if errors == []
+      render status: 200, json: appointments
     else
       render_errors(errors)
     end
   end
 
   def create
+    errors = []
+    create_params = basic_params
+    appointment, errors = Appointment.create_appointment(create_params, errors)
+
+    if errors == []
+      render status: 200, json: appointment
+    else
+      render_errors(errors)
+    end
   end
 
   def update
@@ -70,8 +79,4 @@ class AppointmentsController < ApplicationController
   end
 
   # <------------------------ Setter Methods -------------------------------->
-  def set_all_appointments
-    @appointments = Appointment.all
-  end
-
 end
