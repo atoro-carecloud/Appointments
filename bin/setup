@@ -1,4 +1,3 @@
-#!/usr/bin/env ruby2.3
 require 'pathname'
 
 # path to your application root.
