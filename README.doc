@@ -3,7 +3,7 @@ README
 * Using the API
   - Index/Listing from database
     > To return a JSON object of all appointments saved in the database, use the URL:
-        http://localhost:3000/ ### To change once on heroku
+        https://carecloudapptsapi.herokuapp.com ### To change once on heroku
     > You can put the url in a browser or use curl to send a GET request.
     > There are a number of criteria that can be added to the params part of the URL
       to get a JSON object of some specific appointment(s):
@@ -25,24 +25,24 @@ README
            start_time or end_time. Only one date searching style can be used at
            a time.
     > Examples:
-        1. http://localhost:3000/appointments?first_name=brenda
+        1. https://carecloudapptsapi.herokuapp.com?first_name=brenda
             + Gives all appointments with first_name of brenda
-        2. http://localhost:3000/appointments?first_name=brenda&last_name=hardy
+        2. https://carecloudapptsapi.herokuapp.com?first_name=brenda&last_name=hardy
             + Gives all appointments with name: brenda hardy
-        3. http://localhost:3000/appointments?year=2013&month=11
+        3. https://carecloudapptsapi.herokuapp.com?year=2013&month=11
             + Gives all appointments in November 2013
-        4. http://localhost:3000/appointments?year=2013&month=11&day=1
+        4. https://carecloudapptsapi.herokuapp.com?year=2013&month=11&day=1
             + Gives all appointments on November 1, 2013
-        5. http://localhost:3000/appointments?year=2013&month=11&day=1&hour=11
+        5. https://carecloudapptsapi.herokuapp.com?year=2013&month=11&day=1&hour=11
             + Gives all appointments on November 1, 2013, between 11 AM and 12 noon.
-        6. http://localhost:3000/appointments?year=2013&month=11&day=1&hour=11&min=00
+        6. https://carecloudapptsapi.herokuapp.com?year=2013&month=11&day=1&hour=11&min=00
             + Gives all appointments starting on November 1, 2013 at 11:00 AM exactly
-        7. http://localhost:3000/appointments?month=11
+        7. https://carecloudapptsapi.herokuapp.com?month=11
             + Gives all appointments in November of the current year
-        8. http://localhost:3000/appointments?first_name=brenda&year=2013&month=11
+        8. https://carecloudapptsapi.herokuapp.com?first_name=brenda&year=2013&month=11
             + Gives all appointments for anyone with a first name of brenda during
               November 2013
-        9. http://localhost:3000/appointments?first_name=brenda&start_time=11/1/13 11:00
+        9. https://carecloudapptsapi.herokuapp.com?first_name=brenda&start_time=11/1/13 11:00
             + Gives all appointments for first_name brenda with start time of
               EXACTLY 11:00 AM on Nov. 1, 2013.
     > The year/month/day/hour/min date inputting format is preferred over the
@@ -63,7 +63,7 @@ README
         >> update
         >> delete
     > Example:
-        >> http://localhost:3000/?m=delete&first_name=brenda&last_name=hardy
+        >> https://carecloudapptsapi.herokuapp.com?m=delete&first_name=brenda&last_name=hardy
             + This will delete brenda hardy's appointment if it is the only result
               with those criteria
 
@@ -76,7 +76,7 @@ README
     > Delete will only be successful if there is only one search result to prevent
       mass deletions
     > Example:
-      >> http://localhost:3000/?m=delete&first_name=brenda&last_name=hardy
+      >> https://carecloudapptsapi.herokuapp.com?m=delete&first_name=brenda&last_name=hardy
           + This will delete brenda hardy's appointment if it is the only result
             with those criteria
 
