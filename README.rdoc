@@ -1,19 +1,4 @@
-== README
-
-This README would normally document whatever steps are necessary to get the
-application up and running.
-
-Things you may want to cover:
-
-* Ruby version
-
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
+README
 
 * Using the API
   - Index/Listing from database
@@ -97,42 +82,8 @@ Things you may want to cover:
 
   - Updating an appointment
     > Use `m=update` in the parameters to use the other params to update an appointment
-    > ###Will require more work because there needs to be two sets of variables
-
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
-
-
-Please feel free to use a different markup language if you do not plan to run
-<tt>rake doc:app</tt>.
-
-Dev Notes:
- * Handling CRUD Actions
-    - Create (user sends curl post request)
-      > Example URL: curl -i \
-                     -H "Accept: application/json" \
-                     -H "Content-Type: application/json" \
-                     -X POST -d '{"start_time":"11/7/17 13:30","end_time":"11/7/17 13:40", "first_name":"Bill","last_name":"Golik"}' \
-                     http://localhost:3000/appointments
-    - Update (user sends curl post (patch?) request)
-    - Delete (user sends curl delete request)
-    - List (user sends search params thru url)
-      > Search by:
-        >> day(s), month(s), year(s), hour(s), today
-        >> Working, ideas?
- * Must return valid json
- * Times must be in the future
- * Times cannot overlap existing appointment on the same day
-
-To Do:
- * Limit length of newly created appointments (2 hrs?)
- * Limit times of new appointments to work hours
- * Put minimum length for newly created appointments
- * Save everything lowercase, search should be lowercased
- * Change from UTC to EST everywhere.
+    > Search criteria are the same as any other method to find the correct appointment.
+    > Criteria to update use the same key, except with `n_` prepended.
+      >> Example: http://localhost:3000?m=update&first_name=bill&n_first_name=bob
+      >> This will find bill and (assuming there is only one bill) change his first
+         name to Bob

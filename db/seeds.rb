@@ -27,13 +27,17 @@ csv.each do |row|
   a.first_name = row[2].downcase
   a.last_name = row[3].downcase
   a.comments = row[4] if row[4].nil? == false
-  a.save(validate: false) # This had to be false because validation
-                          # would prevent new appointments from being scheduled
-                          # in the past
+  if a.save(validate: false) # This had to be false because validation would
+                             # prevent new appointments from being scheduled
+                             # in the past
+    puts "#{a.first_name} #{a.last_name}'s appointment is saved."
+    puts "Starts at #{a.start_time} and ends at #{a.end_time}"
+    puts "*" * 60
+  else
+    puts "\tS A V E  F A I L E D"
+    puts "*" * 60
+  end
   # p a
-  puts "#{a.first_name} #{a.last_name}'s appointment is saved."
-  puts "Starts at #{a.start_time} and ends at #{a.end_time}"
-  puts "*" * 60
 end
 
 # End parse appt_data.csv and turn each line into an appointment
