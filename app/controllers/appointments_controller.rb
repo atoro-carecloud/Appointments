@@ -34,16 +34,49 @@ class AppointmentsController < ApplicationController
     appointment, errors = Appointment.create_appointment(create_params, errors)
 
     if errors == []
-      render status: 200, json: appointment
+      render status: 200, json: {
+        message: "Saved successfully!",
+        appointment: appointment
+      }.to_json
     else
       render_errors(errors)
     end
   end
 
   def update
+    # Find Appointment
+    errors = []
+    list_params = search_params
+    appointments = Appointment.set_appointments_if_params(list_params)
+    u_params = update_params
+
+    appointment, errors = Appointment.one_search_result(appointments, errors)
+    appointment, errors = appointment.update_appointment(u_params, errors) if errors == []
+    # Render
+    if errors == []
+      render status: 200, json: {
+        message: "Updated successfully!",
+        appointment: appointment
+      }.to_json
+    else
+      render_errors(errors)
+    end
   end
 
   def destroy
+    errors = []
+    list_params = search_params
+    appointments = Appointment.set_appointments_if_params(list_params)
+    appointment, errors = Appointment.one_search_result(appointments, errors)
+    errors = appointment.delete_appointment(errors) if appointment
+    if errors == []
+      render status: 200, json: {
+        message: "Deleted successfully!",
+        appointment: appointment
+      }.to_json
+    else
+      render_errors(errors)
+    end
   end
 
   # <------------------------ Params Methods -------------------------------->

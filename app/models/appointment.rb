@@ -1,8 +1,11 @@
 class Appointment < ActiveRecord::Base
-  validates :first_name, presence: true
-  validates :last_name, presence: true
-  validates :start_time, presence: true
-  validates :end_time, presence: true
+  validates :first_name, presence: true, on: :create
+  validates :last_name, presence: true, on: :create
+  validates :start_time, presence: true, on: :create
+  validates :end_time, presence: true, on: :create
+  include ActiveModel::Validations
+  validates_with AppointmentDateValidator
+
 
   # <A----------------------- Search Method -------------------------------->
   def self.set_appointments_if_params(some_params)
@@ -152,15 +155,16 @@ class Appointment < ActiveRecord::Base
     some_params = downcase_first_last_names_hash(some_params)
     errors = validate_convert_params_str_dates(some_params, errors)
     some_params = validate_convert_params_str_dates(some_params, errors, 'convert')
-    p "%^" * 40
-    p "create_params"
-    p some_params
     appointment = new(some_params)
+    error_msg = "Error: Appointment could not be saved."
     begin
-      appointment.save
+      saved = appointment.save
+      create_msgs = appointment.errors.messages[:base]
+      errors.push(*create_msgs) if !saved
     rescue
-      errors << "Error: Appointment could not be saved."
+      errors.push(error_msg)
     end
+    p errors
     return appointment, errors
   end
 
@@ -184,6 +188,43 @@ class Appointment < ActiveRecord::Base
     else
       return errors
     end
+  end
+
+  # <B----------------------- Update Method -------------------------------->
+def update_appointment(u_params, errors)
+  # appointment, errors = appointment.update_appointment(u_params, errors)
+  errors.push("Error: No update values given.") if u_params == {}
+  # Convert Params
+  adj_u_params = {}
+  u_params.each do |k, v|
+    i = k.to_s[2..-1].to_sym
+    adj_u_params[i] = v
+  end
+  # Reformat dates
+  adj_u_params = Appointment.convert_both_dates_str_to_dt(adj_u_params)
+  # Downsize names
+  adj_u_params = Appointment.downcase_first_last_names_hash(adj_u_params)
+  # Update
+  updated = self.update(adj_u_params)
+  if !updated
+    errors.push("Error: Appointment failed to update.")
+  end
+  return self, errors
+end
+
+def self.one_search_result(appointments, errors)
+  if appointments.length == 1
+    appointment = appointments.first
+  else
+    errors.push("Error: Zero or Multiple entries with those criteria.")
+  end
+  return appointment, errors
+end
+
+  # <B----------------------- Create Method -------------------------------->
+  def delete_appointment(errors)
+    errors.push("Error: Could not delete appointment.") if !self.delete
+    errors
   end
 
   # <----------------------- Date Manipulation Methods ------------------------->
@@ -221,6 +262,5 @@ class Appointment < ActiveRecord::Base
       break if x == specificity
     end
   end
-
 
 end # Final End

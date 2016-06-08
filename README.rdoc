@@ -1,28 +1,89 @@
-== README
+README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+* Using the API
+  - Index/Listing from database
+    > To return a JSON object of all appointments saved in the database, use the URL:
+        http://localhost:3000/ ### To change once on heroku
+    > You can put the url in a browser or use curl to send a GET request.
+    > There are a number of criteria that can be added to the params part of the URL
+      to get a JSON object of some specific appointment(s):
+        >> year (four character number; ex: 2016)
+        >> month (one or two character number; ex: 12 (for December))
+        >> day (one or two character number; ex: 21 (for the 21st day of a month))
+        >> hour (one or two character number, 0-23; ex: 22 (for 11:00 PM))
+        >> min (one or two character number, 1-60;)
+        >> last_name (lowercase string of last name; ex: "kirksey")
+        >> first_name (lowercase string of first name; ex: "jewell")
+        >> start_time (formatting is very specific)
+            + MUST be formatted like so: "M/D/Y HH:MM" (ex: 11/7/13 10:15)
+            + This formatting was chosen because this is how it dates are stored
+              in appt_data.csv
+        >> end_time (same formatting as start_time)
+    > Any combination of these criteria can be used to refine your returned JSON
+      object, EXCEPT:
+        >> You CANNOT give any of year, month, day, hour AND also give a
+           start_time or end_time. Only one date searching style can be used at
+           a time.
+    > Examples:
+        1. http://localhost:3000/appointments?first_name=brenda
+            + Gives all appointments with first_name of brenda
+        2. http://localhost:3000/appointments?first_name=brenda&last_name=hardy
+            + Gives all appointments with name: brenda hardy
+        3. http://localhost:3000/appointments?year=2013&month=11
+            + Gives all appointments in November 2013
+        4. http://localhost:3000/appointments?year=2013&month=11&day=1
+            + Gives all appointments on November 1, 2013
+        5. http://localhost:3000/appointments?year=2013&month=11&day=1&hour=11
+            + Gives all appointments on November 1, 2013, between 11 AM and 12 noon.
+        6. http://localhost:3000/appointments?year=2013&month=11&day=1&hour=11&min=00
+            + Gives all appointments starting on November 1, 2013 at 11:00 AM exactly
+        7. http://localhost:3000/appointments?month=11
+            + Gives all appointments in November of the current year
+        8. http://localhost:3000/appointments?first_name=brenda&year=2013&month=11
+            + Gives all appointments for anyone with a first name of brenda during
+              November 2013
+        9. http://localhost:3000/appointments?first_name=brenda&start_time=11/1/13 11:00
+            + Gives all appointments for first_name brenda with start time of
+              EXACTLY 11:00 AM on Nov. 1, 2013.
+    > The year/month/day/hour/min date inputting format is preferred over the
+      start_time/end_time format due to flexibility.
+    > With year/month/day/hour/min, search will be specific to the most precise time
+      measurement.
+    > start_time/end_time searches will always be specific to the day.
+    > Using year/month/day/hour/min format will assume the current year/month/day/hour/min
+      when none is given. See example 6.
+    > ### Working just fine
 
-Things you may want to cover:
+  - Choosing a CRUD Method:
+    > Parameters are entered into the API in the same way for all 4 CRUD methods.
+    > To indicate which you'd like to use, set the parameter `m` in the URL.
+    > There are four options:
+        >> list (not required - default option)
+        >> create
+        >> update
+        >> delete
+    > Example:
+        >> http://localhost:3000/?m=delete&first_name=brenda&last_name=hardy
+            + This will delete brenda hardy's appointment if it is the only result
+              with those criteria
 
-* Ruby version
+  - Creating an appointment
+    > Use `m=create` in the parameters to use the other params to create an appointment
 
-* System dependencies
+  - Deleting an appointment
+    > Use `m=delete` in the parameters to delete the appointment that is found based
+      on the other params.
+    > Delete will only be successful if there is only one search result to prevent
+      mass deletions
+    > Example:
+      >> http://localhost:3000/?m=delete&first_name=brenda&last_name=hardy
+          + This will delete brenda hardy's appointment if it is the only result
+            with those criteria
 
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
-
-
-Please feel free to use a different markup language if you do not plan to run
-<tt>rake doc:app</tt>.
+  - Updating an appointment
+    > Use `m=update` in the parameters to use the other params to update an appointment
+    > Search criteria are the same as any other method to find the correct appointment.
+    > Criteria to update use the same key, except with `n_` prepended.
+      >> Example: http://localhost:3000?m=update&first_name=bill&n_first_name=bob
+      >> This will find bill and (assuming there is only one bill) change his first
+         name to Bob
