@@ -3,7 +3,7 @@ README
 * Using the API
   - Index/Listing from database
     > To return a JSON object of all appointments saved in the database, use the URL:
-        https://carecloudapptsapi.herokuapp.com ### To change once on heroku
+        https://carecloudapptsapi.herokuapp.com
     > You can put the url in a browser or use curl to send a GET request.
     > There are a number of criteria that can be added to the params part of the URL
       to get a JSON object of some specific appointment(s):
@@ -52,7 +52,6 @@ README
     > start_time/end_time searches will always be specific to the day.
     > Using year/month/day/hour/min format will assume the current year/month/day/hour/min
       when none is given. See example 6.
-    > ### Working just fine
 
   - Choosing a CRUD Method:
     > Parameters are entered into the API in the same way for all 4 CRUD methods.
